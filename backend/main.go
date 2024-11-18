@@ -12,11 +12,9 @@ import (
 func cadastroHandler(w http.ResponseWriter, r *http.Request) {
 	// Verificar se é uma requisição POST
 	if r.Method == http.MethodPost {
-		// Simulação de processo de cadastro (aqui você faria o que for necessário com os dados)
 		// Acessando o corpo da requisição (para garantir que os dados estão chegando corretamente)
 		var dados map[string]interface{}
-		// Se você precisar manipular o corpo JSON
-		// Isso é um exemplo de como você poderia deserializar o JSON recebido:
+
 		decoder := json.NewDecoder(r.Body)
 		if err := decoder.Decode(&dados); err != nil {
 			http.Error(w, "Erro ao ler os dados", http.StatusBadRequest)
