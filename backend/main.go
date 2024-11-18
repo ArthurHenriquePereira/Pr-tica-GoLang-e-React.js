@@ -1,40 +1,21 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
+	"backend/db"
+	"backend/handlers"
 	"log"
 	"net/http"
 
 	"github.com/rs/cors"
 )
 
-func cadastroHandler(w http.ResponseWriter, r *http.Request) {
-	// Verificar se é uma requisição POST
-	if r.Method == http.MethodPost {
-		// Acessando o corpo da requisição (para garantir que os dados estão chegando corretamente)
-		var dados map[string]interface{}
-
-		decoder := json.NewDecoder(r.Body)
-		if err := decoder.Decode(&dados); err != nil {
-			http.Error(w, "Erro ao ler os dados", http.StatusBadRequest)
-			return
-		}
-
-		// Imprimir os dados recebidos para debug
-		fmt.Printf("Dados recebidos: %+v\n", dados)
-
-		// Responder com uma mensagem de sucesso
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, `{"message": "Cadastro recebido com sucesso"}`)
-	} else {
-		// Se a requisição não for POST
-		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
-	}
-}
-
 func main() {
+	// Inicializar o banco de dados
+	if err := db.InitDB(); err != nil {
+		log.Fatalf("Erro ao conectar ao banco de dados: %v", err)
+	}
+	defer db.CloseDB() // Garantir que a conexão será fechada
+
 	// Configuração do CORS
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"}, // Permite o frontend
@@ -44,7 +25,7 @@ func main() {
 	})
 
 	// Roteamento
-	http.HandleFunc("/api/cadastro", cadastroHandler)
+	http.HandleFunc("/api/cadastro", handlers.CadastroHandler)
 
 	// Aplica o CORS e inicia o servidor
 	handler := c.Handler(http.DefaultServeMux)
